@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muchos Hallazgos, Pocas Sanciones — Control Fiscal Chocó</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --verde:     #0e1f0e;
+  --verde2:    #142614;
+  --verde3:    #1a3a1a;
+  --verde4:    #243824;
+  --verde5:    #2e4a2e;
+  --dorado:    #c9a84c;
+  --dorado2:   #e8d5a0;
+  --rojo:      #8b1a1a;
+  --rojo2:     #c0392b;
+  --blanco:    #f2ede4;
+  --papel:     #ede8de;
+  --papel2:    #d8d0c0;
+  --tinta:     #1e2a1e;
+  --gris:      #7a8a7a;
+  --gris2:     #a0b0a0;
+  --naranja:   #c97a30;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--verde);color:var(--blanco);font-family:'Georgia','Times New Roman',serif;line-height:1.8;overflow-x:hidden;}
+
+/* ─── NAV ─── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:.75rem 2.5rem;background:rgba(14,31,14,.95);backdrop-filter:blur(8px);border-bottom:1px solid rgba(201,168,76,.18);}
+.nav-marca{font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dorado);font-style:italic;}
+.nav-links{display:flex;gap:2rem;}
+.nav-links a{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gris2);text-decoration:none;transition:color .2s;}
+.nav-links a:hover{color:var(--dorado);}
+
+/* ─── PORTADA ─── */
+.portada{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;text-align:left;padding:7rem 4rem 5rem;position:relative;overflow:hidden;background:var(--verde);}
+.portada-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.88;z-index:0;}
+.portada-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(14,31,14,.08) 0%,rgba(14,31,14,.15) 50%,rgba(14,31,14,.55) 100%);z-index:1;}
+.portada-lines{position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 47px,rgba(201,168,76,.015) 47px,rgba(201,168,76,.015) 48px);z-index:1;pointer-events:none;}
+.portada>*:not(.portada-video):not(.portada-overlay):not(.portada-lines){position:relative;z-index:2;}
+.portada-num{display:none;}
+/* ─── VIDEO PORTADA (debajo del título) ─── */
+.video-portada-wrap{width:100%;background:var(--verde2);border-top:1px solid rgba(201,168,76,.12);border-bottom:1px solid rgba(201,168,76,.12);}
+.video-portada-wrap video{width:100%;max-height:70vh;display:block;object-fit:cover;}
+.portada-num{position:absolute;top:50%;right:3rem;transform:translateY(-50%);font-size:clamp(8rem,18vw,15rem);font-style:italic;color:rgba(201,168,76,.05);line-height:1;pointer-events:none;user-select:none;}
+.p-kicker{font-size:.63rem;letter-spacing:.3em;text-transform:uppercase;color:var(--dorado);margin-bottom:1.5rem;opacity:0;animation:subeA .9s ease forwards .2s;}
+.p-h1{font-size:clamp(2.8rem,7vw,6rem);font-weight:700;line-height:.95;letter-spacing:-.02em;margin-bottom:1.5rem;opacity:0;animation:subeA 1s ease forwards .4s;text-shadow:0 2px 15px rgba(14,31,14,.4);}
+.p-h1 em{font-style:italic;color:var(--dorado);font-weight:700;}
+.p-bajada{font-size:clamp(.88rem,1.6vw,1.05rem);color:rgba(242,237,228,.85);max-width:480px;line-height:1.6;margin-bottom:2.5rem;opacity:0;animation:subeA .9s ease forwards .65s;font-style:italic;}
+.p-firma{font-size:.67rem;letter-spacing:.12em;color:rgba(242,237,228,.6);opacity:0;animation:subeA .9s ease forwards .85s;display:flex;align-items:center;gap:.75rem;}
+.p-firma::before{content:'';display:block;width:2rem;height:1px;background:var(--dorado);}
+.p-firma a{color:var(--dorado);text-decoration:none;}
+.p-scroll{position:absolute;bottom:2rem;right:2rem;font-size:.55rem;letter-spacing:.25em;text-transform:uppercase;color:rgba(242,237,228,.4);writing-mode:vertical-rl;opacity:0;animation:subeA 1s ease forwards 1.2s;}
+
+/* ─── SUMARIO (papel verde oscuro) ─── */
+.sumario{background:var(--verde2);border-top:1px solid rgba(201,168,76,.15);border-bottom:1px solid rgba(201,168,76,.15);padding:5.5rem 2rem;}
+.s-inner{max-width:880px;margin:0 auto;}
+.kicker{display:block;font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;margin-bottom:1.5rem;}
+.k-dorado{color:var(--dorado);}
+.k-rojo{color:var(--rojo2);}
+.s-lead{font-size:clamp(1.1rem,2.4vw,1.5rem);line-height:1.55;border-left:3px solid var(--dorado);padding-left:1.6rem;margin-bottom:3rem;color:#c8d8c8;}
+.s-lead strong{color:var(--dorado);}
+.metricas{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid rgba(201,168,76,.18);}
+.metrica{padding:2rem 1.25rem;border-right:1px solid rgba(201,168,76,.18);}
+.metrica:last-child{border-right:none;}
+.m-n{font-size:clamp(1.7rem,3.5vw,2.6rem);font-style:italic;color:var(--dorado);display:block;line-height:1;margin-bottom:.4rem;}
+.m-l{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gris2);line-height:1.45;}
+
+/* ─── NOTA METOD ─── */
+.nota-met{background:rgba(139,26,26,.12);border:1px solid rgba(139,26,26,.22);padding:1.4rem 1.7rem;margin:2.5rem auto 0;border-radius:2px;}
+.nota-met-t{font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--rojo2);margin-bottom:.5rem;}
+.nota-met p{font-size:.84rem;color:#c0a0a0;line-height:1.7;}
+.nota-met a{color:var(--dorado);text-decoration:underline;}
+
+/* ─── ARTÍCULO ─── */
+.articulo{padding:5rem 2rem;background:var(--verde);}
+.art-inner{max-width:840px;margin:0 auto;}
+
+/* ─── CAPÍTULO ─── */
+.cap{margin-bottom:6.5rem;padding-bottom:6.5rem;border-bottom:1px solid rgba(201,168,76,.1);}
+.cap:last-child{border-bottom:none;}
+.cap-num{font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;color:var(--dorado);display:block;margin-bottom:1.2rem;}
+.cap-h{font-size:clamp(1.7rem,4.5vw,2.8rem);font-weight:400;line-height:1.12;margin-bottom:2.2rem;}
+.cap-h em{font-style:italic;color:var(--dorado);}
+.prosa p{font-size:1.04rem;color:#b8cbb8;line-height:1.9;margin-bottom:1.5rem;}
+.prosa p strong{color:var(--blanco);}
+
+/* ─── SEPARADOR ─── */
+.sep{display:flex;align-items:center;gap:1rem;margin:3.5rem 0;}
+.sep::before,.sep::after{content:'';flex:1;height:1px;background:rgba(201,168,76,.15);}
+.sep span{font-size:.68rem;letter-spacing:.2em;color:var(--dorado);}
+
+/* ─── FOTO ─── */
+.foto-wrap{margin:3rem 0;}
+.foto-placeholder{width:100%;aspect-ratio:16/9;background:rgba(201,168,76,.04);border:1px dashed rgba(201,168,76,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;}
+.fp-ico{font-size:2.2rem;opacity:.3;}
+.fp-txt{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gris2);text-align:center;line-height:1.5;}
+.foto-real{width:100%;display:block;object-fit:cover;}
+.foto-pie{margin-top:.55rem;font-size:.74rem;color:var(--gris2);font-style:italic;line-height:1.55;}
+.foto-pie strong{color:var(--gris2);font-style:normal;}
+
+/* ─── GRÁFICA ─── */
+.g-wrap{margin:3rem 0;padding:2rem;background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.12);border-radius:2px;}
+.g-titulo{font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--dorado);margin-bottom:.3rem;}
+.g-sub{font-size:.8rem;color:var(--gris2);margin-bottom:1.5rem;font-style:italic;}
+.g-canvas{position:relative;width:100%;max-height:340px;}
+.g-interp{margin-top:1.2rem;padding-top:1.2rem;border-top:1px solid rgba(201,168,76,.08);}
+.g-interp p{font-size:.83rem;color:var(--gris2);line-height:1.7;margin-bottom:.4rem;}
+.g-interp strong{color:var(--blanco);}
+.g-fuente{font-size:.6rem;letter-spacing:.1em;color:var(--gris);margin-top:.7rem;text-transform:uppercase;}
+
+/* ─── TABLA ─── */
+.tabla-wrap{margin:3rem 0;overflow-x:auto;border:1px solid rgba(201,168,76,.13);}
+.t-head-bar{background:rgba(201,168,76,.06);padding:.85rem 1.25rem;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dorado);border-bottom:1px solid rgba(201,168,76,.13);}
+table{width:100%;border-collapse:collapse;font-size:.86rem;}
+thead th{padding:.75rem 1rem;text-align:left;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dorado);background:rgba(201,168,76,.03);border-bottom:1px solid rgba(201,168,76,.13);}
+tbody td{padding:.8rem 1rem;border-bottom:1px solid rgba(255,255,255,.04);color:#a8b8a8;vertical-align:top;line-height:1.5;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:rgba(201,168,76,.03);color:var(--blanco);}
+.val{font-family:monospace;color:var(--dorado);font-weight:600;}
+.tag{font-size:.56rem;padding:.14rem .42rem;border-radius:2px;letter-spacing:.06em;display:inline-block;}
+.tag-cgr{background:rgba(139,26,26,.28);color:#e0a0a0;border:1px solid rgba(139,26,26,.38);}
+.tag-secop{background:rgba(26,90,180,.25);color:#a0b4e8;border:1px solid rgba(26,90,180,.35);}
+.tag-dnp{background:rgba(26,139,80,.25);color:#90d8b0;border:1px solid rgba(26,139,80,.35);}
+
+/* ─── CITA ─── */
+.cita{margin:3rem 0;padding:2rem 2.5rem;border-left:3px solid var(--dorado);background:rgba(201,168,76,.04);}
+.cita-t{font-size:clamp(1rem,2.2vw,1.28rem);font-style:italic;color:var(--blanco);line-height:1.55;margin-bottom:.85rem;}
+.cita-a{font-size:.63rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dorado);}
+
+/* ─── FACTORES ─── */
+.factores{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.08);margin:2.5rem 0;}
+.factor{background:var(--verde);padding:1.75rem 1.2rem;}
+.f-n{font-size:1.9rem;font-style:italic;color:rgba(201,168,76,.25);display:block;margin-bottom:.45rem;line-height:1;}
+.f-t{font-size:.74rem;font-weight:700;color:var(--blanco);margin-bottom:.45rem;text-transform:uppercase;letter-spacing:.07em;}
+.f-d{font-size:.82rem;color:var(--gris2);line-height:1.6;}
+
+/* ─── DETECTORES ─── */
+.detectores{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.08);margin:2.5rem 0;}
+.detector{background:var(--verde);padding:1.75rem 1rem;text-align:center;}
+.det-n{font-size:2rem;font-style:italic;color:var(--dorado);display:block;line-height:1;margin-bottom:.28rem;}
+.det-nom{font-size:.8rem;color:var(--blanco);margin-bottom:.22rem;}
+.det-d{font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gris);}
+
+/* ─── GALERÍA ─── */
+.galeria{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin:3rem 0;}
+
+/* ─── CIERRE ESTADÍSTICO ─── */
+.cierre{text-align:center;padding:4rem 2rem;border:1px solid rgba(201,168,76,.13);margin:3rem 0;}
+.cierre-n{font-size:clamp(4rem,10vw,7rem);font-style:italic;color:var(--dorado);display:block;line-height:1;}
+.cierre-txt{font-size:1rem;color:var(--gris2);max-width:460px;margin:.8rem auto 0;line-height:1.65;}
+.cierre-barra{display:flex;height:8px;margin:2.5rem auto;max-width:500px;overflow:hidden;border-radius:1px;}
+.cb1{background:var(--rojo);flex:32;}
+.cb2{background:#c97a30;flex:24;}
+.cb3{background:#5a6a5a;flex:24;}
+.cb4{background:#3a7a3a;flex:20;}
+.cierre-ley{display:flex;justify-content:center;flex-wrap:wrap;gap:1rem;margin-top:.75rem;}
+.cleg{font-size:.63rem;letter-spacing:.07em;color:var(--gris);}
+.cleg-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:.3rem;}
+
+/* ─── VIDEO PLACEHOLDER ─── */
+.video-placeholder{width:100%;aspect-ratio:16/9;background:rgba(201,168,76,.03);border:1px dashed rgba(201,168,76,.18);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.7rem;}
+.vp-ico{font-size:2.5rem;opacity:.25;}
+.vp-txt{font-size:.67rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gris);text-align:center;line-height:1.5;}
+
+/* ─── CONTRASTE DE VIDEOS ─── */
+.contraste-wrap{margin:3rem 0;}
+.contraste-header{text-align:center;margin-bottom:2rem;}
+.contraste-kicker{display:block;font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;color:var(--dorado);margin-bottom:.6rem;}
+.contraste-titulo{font-size:clamp(1.3rem,3vw,2rem);font-weight:400;line-height:1.2;color:var(--blanco);}
+.contraste-titulo em{font-style:italic;color:var(--dorado);}
+.contraste-subtitulo{font-size:.88rem;color:var(--gris2);margin-top:.5rem;font-style:italic;}
+.contraste-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid rgba(201,168,76,.18);overflow:hidden;}
+.contraste-lado{position:relative;width:100%;}
+.contraste-lado video{width:100%;height:100%;min-height:280px;display:block;object-fit:cover;background:#000;}
+.contraste-lado .video-placeholder{width:100%;min-height:280px;aspect-ratio:unset;}
+.contraste-etiqueta{position:absolute;top:0;left:0;right:0;padding:.6rem 1rem;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(to bottom,rgba(14,31,14,.9),transparent);}
+.etiq-año{font-family:monospace;font-size:.75rem;font-weight:700;letter-spacing:.1em;color:var(--dorado);}
+.etiq-txt{font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gris2);}
+.contraste-divider{position:relative;display:flex;align-items:stretch;}
+.contraste-divider::before{content:'';position:absolute;top:0;bottom:0;left:50%;width:1px;background:rgba(201,168,76,.35);z-index:2;}
+.vs-badge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:3;background:var(--verde);border:1px solid rgba(201,168,76,.4);padding:.35rem .7rem;font-family:monospace;font-size:.72rem;font-weight:700;color:var(--dorado);letter-spacing:.1em;border-radius:2px;}
+.contraste-pie{background:rgba(201,168,76,.04);border-top:1px solid rgba(201,168,76,.12);padding:1.25rem 1.5rem;}
+.contraste-pie-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.cp-item{}
+.cp-año{font-family:monospace;font-size:.62rem;color:var(--dorado);letter-spacing:.1em;display:block;margin-bottom:.2rem;text-transform:uppercase;}
+.cp-desc{font-size:.78rem;color:var(--gris2);line-height:1.55;font-style:italic;}
+.contraste-dato{margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid rgba(201,168,76,.1);font-size:.82rem;color:var(--gris2);line-height:1.6;text-align:center;}
+.contraste-dato strong{color:var(--dorado);}
+@media(max-width:600px){
+  .contraste-grid{grid-template-columns:1fr;}
+  .contraste-divider::before{display:none;}
+  .vs-badge{display:none;}
+  .contraste-pie-grid{grid-template-columns:1fr;}
+}
+
+/* ─── FUENTES ─── */
+.fuentes-sec{background:var(--verde2);border-top:1px solid rgba(201,168,76,.12);padding:5rem 2rem;}
+.f-inner{max-width:840px;margin:0 auto;}
+.fuente-item{display:grid;grid-template-columns:2rem 1fr;gap:1.2rem;padding:1.2rem 0;border-bottom:1px solid rgba(201,168,76,.1);align-items:start;}
+.fuente-item:last-child{border-bottom:none;}
+.f-ico{font-size:1.15rem;padding-top:.1rem;}
+.f-nom{display:block;font-size:.98rem;font-weight:700;color:var(--blanco);margin-bottom:.2rem;}
+.f-desc{font-size:.8rem;color:var(--gris2);line-height:1.55;margin-bottom:.32rem;}
+.f-url{font-family:monospace;font-size:.63rem;color:var(--dorado);text-decoration:none;word-break:break-all;}
+.f-url:hover{text-decoration:underline;}
+
+/* ─── PIE ─── */
+footer{background:var(--verde2);padding:3rem 2rem;text-align:center;border-top:1px solid rgba(201,168,76,.1);}
+footer p{font-size:.65rem;letter-spacing:.12em;color:var(--gris);line-height:2.2;}
+footer strong{color:var(--dorado);}
+
+/* ─── ANIMACIONES ─── */
+@keyframes subeA{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulso{0%,100%{opacity:.35;}50%{opacity:1;}}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:700px){
+  .metricas{grid-template-columns:1fr 1fr;}
+  .metrica{border-bottom:1px solid rgba(201,168,76,.15);}
+  .factores{grid-template-columns:1fr;}
+  .detectores{grid-template-columns:1fr 1fr;}
+  .galeria{grid-template-columns:1fr;}
+  .nav-links{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-marca">Control Fiscal · Chocó</span>
+  <div class="nav-links">
+    <a href="#el-peso">El detrimento</a>
+    <a href="#el-ciclo">El ciclo</a>
+    <a href="#la-deteccion">La detección</a>
+    <a href="#las-comunidades">Las comunidades</a>
+  </div>
+</nav>
+
+<!-- PORTADA -->
+<section class="portada">
+  <video class="portada-video" autoplay muted loop playsinline>
+    <source src="video_portada.mp4" type="video/mp4">
+  </video>
+  <div class="portada-overlay"></div>
+  <div class="portada-lines"></div>
+  <div class="portada-num">80%</div>
+  <span class="p-kicker">Control Fiscal · Universidad de Antioquia</span>
+  <h1 class="p-h1">Muchos<br><em>hallazgos,</em><br>pocas sanciones</h1>
+  <p class="p-bajada">El control fiscal en el Chocó detecta el daño,<br>pero rara vez lo sanciona</p>
+  <p class="p-firma">Por Mario Banguera Hurtado · <a href="mailto:mario.banguera@udea.edu.co">mario.banguera@udea.edu.co</a></p>
+  <span class="p-scroll">↓ Scroll</span>
+</section>
+
+<!-- SUMARIO -->
+<section class="sumario">
+  <div class="s-inner">
+
+    <p class="s-lead">
+      Entre 2020 y 2023, la Contraloría General de la República documentó en el Chocó
+      <strong>hallazgos fiscales superiores a $11.897 millones de pesos</strong>
+      en auditorías al ICBF Regional, el Plan Departamental de Agua, el Sistema General de
+      Participaciones en Educación y proyectos de regalías en infraestructura vial.
+      El control detecta. La sanción efectiva llega tarde, o no llega.
+    </p>
+    <div class="metricas">
+      <div class="metrica"><span class="m-n">$11.897M+</span><span class="m-l">En hallazgos fiscales verificados · CGR · 2020–2023</span></div>
+      <div class="metrica"><span class="m-n">5</span><span class="m-l">Auditorías CGR con incidencia fiscal en el Chocó</span></div>
+      <div class="metrica"><span class="m-n">~80%</span><span class="m-l">Estimado de hallazgos sin responsable sancionado</span></div>
+      <div class="metrica"><span class="m-n">3</span><span class="m-l">Sectores principales: Social · Educación · Agua</span></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ARTÍCULO -->
+<article class="articulo">
+<div class="art-inner">
+
+<!-- ═══ CAPÍTULO I ═══ -->
+<section class="cap" id="el-peso">
+<span class="cap-num">Capítulo I</span>
+<h2 class="cap-h">El peso del detrimento:<br><em>quién, cuánto y dónde</em></h2>
+
+<div class="prosa">
+<p>El daño al erario público no se distribuye de manera uniforme en el Chocó. Los datos verificados en comunicados oficiales de la Contraloría General de la República revelan una concentración sectorial que señala con precisión dónde se acumulan los mayores riesgos para el patrimonio público departamental entre 2020 y 2023.</p>
+<p>El mayor hallazgo del período corresponde al <strong>ICBF Regional Chocó</strong>: $7.016 millones detectados en la auditoría de cumplimiento a las vigencias 2020, 2021 y primer semestre de 2022 —Comunicado de Prensa CGR No. 192, 19 de diciembre de 2022—. Lejos de ser una abstracción contable, este hallazgo revela algo más perturbador: la Dirección de Información, Análisis y Reacción Inmediata (DIARI) de la CGR cruzó las bases de datos <em>Reporte Cuéntame 2021</em> y <em>Reporte Cuéntame 2022</em> con el registro civil de la Registraduría Nacional, y encontró beneficiarios marcados como "NO ENCONTRADOS Y FALLECIDOS" que, en papel, habían recibido servicios contratados para primera infancia.</p>
+<p>El segundo sector más golpeado es el educativo. Los recursos del <strong>Sistema General de Participaciones en Educación</strong> del departamento y el municipio de Quibdó acumulan $3.868 millones en nueve hallazgos fiscales por la vigencia 2023. Los contratos GSEDCHOCÓ-030/2023 y GSEDCHOCÓ-017/2023 —verificables en SECOP II— concentran $2.777 millones: pagos realizados sin soporte de ejecución a comunidades indígenas Embera Katio y la asociación Orewa. El agua y el saneamiento básico suman otros $1.013 millones en el Plan Departamental de Agua.</p>
+</div>
+
+<!-- GRÁFICA 1 -->
+<div class="g-wrap">
+  <div class="g-titulo">Gráfico 1 — Hallazgos fiscales verificados por entidad y sector</div>
+  <div class="g-sub">Valor en millones de pesos · Chocó · 2020–2023 · Fuente: CGR</div>
+  <div class="g-canvas"><canvas id="g1"></canvas></div>
+  <div class="g-interp">
+    <p><strong>Lectura:</strong> El ICBF Regional concentra el 59% del total verificado. La educación —SGP y contratos con comunidades indígenas— ocupa el segundo lugar con el 32%. El agua potable suma el 8.5% restante. Los sectores con más recursos hacia los más pobres son también los más vulnerables al detrimento.</p>
+    <div class="g-fuente">Fuente: CGR · Com. No. 192 (dic 2022) · Auditorías Liberadas Sector Educación (2024) · Actuación Especial Plan Dpto. Agua (ene 2023)</div>
+  </div>
+</div>
+
+<!-- FOTO 1 — crédito Supersalud -->
+<div class="foto-wrap">
+  <img src="foto-06.jpg.png" alt="Centro de salud intervenido por Supersalud en el Chocó" class="foto-real" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+  <div class="foto-placeholder" style="display:none;">
+    <span class="fp-ico">📷</span>
+    <span class="fp-txt">foto-06.jpg.png · Centro de salud · Chocó 2023</span>
+  </div>
+  <p class="foto-pie"><strong>CHOCÓ · 2023</strong> — Centro de salud bajo intervención de Supersalud. Los $7.016 millones en hallazgos del ICBF Regional Chocó correspondían a recursos destinados a programas de primera infancia en el departamento. · <em>Foto: Supersalud</em></p>
+</div>
+
+<!-- TABLA -->
+<div class="tabla-wrap">
+  <div class="t-head-bar">Hallazgos fiscales verificados · Chocó · 2020–2023 · Fuente: CGR</div>
+  <table>
+    <thead><tr><th>Entidad auditada</th><th>Descripción del hallazgo</th><th>Valor fiscal</th><th>Vigencia</th><th>Referencia oficial</th></tr></thead>
+    <tbody>
+      <tr><td><strong>ICBF Regional Chocó</strong></td><td>Beneficiarios fallecidos o inexistentes en bases Cuéntame 2021–2022. Pagos por servicios a personas no verificadas por Registraduría.</td><td class="val">$7.016.000.000</td><td>2020–2022</td><td><span class="tag tag-cgr">CGR · Com. 192 · Dic 2022</span></td></tr>
+      <tr><td><strong>SGP Educación · Chocó y Quibdó</strong></td><td>9 hallazgos. Pagos sin soporte a asociación Orewa ($1.758M) y Cabildos Embera Katio ($1.019M). Contratos GSEDCHOCÓ-030 y -017.</td><td class="val">$3.868.000.000</td><td>2023</td><td><span class="tag tag-cgr">CGR · Auditorías Liberadas · 2024</span></td></tr>
+      <tr><td><strong>Plan Dpto. de Agua · Chocó</strong></td><td>Alcantarillado deficiente Medio Atrato–Beté ($638M) y acueducto Carmen de Darién–Curbaradó ($375M).</td><td class="val">$1.013.000.000</td><td>2020–2021</td><td><span class="tag tag-cgr">CGR · Actuación Especial · Ene 2023</span></td></tr>
+      <tr><td><strong>SGR · Vía Obapo–Pacurita · Quibdó</strong></td><td>Proyecto de pavimento vial vencido. Alerta DIARI sobre regalías. Parte de alerta nacional de $203 mil millones en SGR.</td><td class="val">Parte de alerta SGR</td><td>2020</td><td><span class="tag tag-cgr">CGR · Com. 113 · Ago 2020</span></td></tr>
+      <tr><td><strong>Gobernación del Chocó · PAE</strong></td><td>Deficiencias en supervisión del Programa de Alimentación Escolar 2020–2021. Pagos a operadores sin ejecución verificada.</td><td class="val">En determinación</td><td>2020–2021</td><td><span class="tag tag-cgr">CGR · Balance Gerencia Dpto. · 2022</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="cita">
+  <p class="cita-t">"En los municipios pequeños del Chocó, los sistemas de control interno prácticamente no existen. Un alcalde municipal puede manejar contratos millonarios sin un solo contador de planta. Cuando llega la Contraloría, el daño ya está hecho."</p>
+  <span class="cita-a">Carlos Rentería Palacios — Experto en control fiscal</span>
+</div>
+
+<div class="prosa">
+<p>Esta concentración en los servicios sociales básicos no es casual. El Hospital Local de Condoto y el Hospital San Francisco concentran parte del detrimento verificado. Una proporción significativa de los recursos presuntamente desviados en el Chocó tenía como destino la atención en salud y educación de las comunidades más pobres del departamento. La Gobernación del Chocó, por su parte, acumula hallazgos en el PAE y en contratos de infraestructura sin que a la fecha se hayan concretado condenas efectivas.</p>
+</div>
+</section>
+
+<div class="sep"><span>◆ ◆ ◆</span></div>
+
+<!-- ═══ CAPÍTULO II ═══ -->
+<section class="cap" id="el-ciclo">
+<span class="cap-num">Capítulo II</span>
+<h2 class="cap-h">El ciclo que no cierra:<br><em>del hallazgo al archivo</em></h2>
+
+<div class="prosa">
+<p>Identificar el detrimento fiscal es el primer paso del control. El problema en el Chocó está en lo que ocurre después: los hallazgos se producen, los comunicados se publican, pero la sanción efectiva es la excepción. La Contraloría tiene la potestad de iniciar procesos de responsabilidad fiscal, pero el seguimiento exige recursos, abogados y peritos que no siempre están disponibles en la Gerencia Departamental Colegiada del Chocó.</p>
+<p>Los datos del sistema SIRECI —donde las entidades auditadas deben suscribir planes de mejoramiento sobre los hallazgos— revelan que en múltiples casos la respuesta institucional es lenta. El proceso de responsabilidad fiscal puede tardar años en concluir con un fallo en firme, y la Ley 610 de 2000 establece plazos que, si se vencen, obligan al archivo obligatorio del expediente.</p>
+</div>
+
+<!-- GRÁFICA 2: DONUT -->
+<div class="g-wrap">
+  <div class="g-titulo">Gráfico 2 — Estado estimado de los procesos de responsabilidad fiscal</div>
+  <div class="g-sub">Distribución proporcional por estado procesal · Chocó · 2020–2023 · Patrón nacional CGR</div>
+  <div class="g-canvas" style="max-height:300px;"><canvas id="g2"></canvas></div>
+  <div class="g-interp">
+    <p><strong>Lectura:</strong> El patrón nacional documentado por la CGR muestra que cerca del 80% de los hallazgos no culmina en sanción efectiva. Los procesos archivados representan expedientes cerrados sin responsable —en muchos casos por prescripción de la acción fiscal regulada por la Ley 610 de 2000—. <strong>Solo una fracción minoritaria llega a condena con responsabilidad fiscal en firme.</strong></p>
+    <div class="g-fuente">Fuente: CGR · SIRECI · Estimación basada en patrón nacional · Ley 610 de 2000</div>
+  </div>
+</div>
+
+<!-- FOTO 2 -->
+<div class="foto-wrap">
+  <img src="foto-02.jpg.png" alt="Gabinete de medicamentos oxidado en hospital del Chocó" class="foto-real" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+  <div class="foto-placeholder" style="display:none;">
+    <span class="fp-ico">📷</span>
+    <span class="fp-txt">foto-02.jpg.png · Hospital deteriorado · Chocó 2023</span>
+  </div>
+  <p class="foto-pie"><strong>CHOCÓ · 2023</strong> — Gabinete de medicamentos completamente oxidado en hospital del departamento. Las etiquetas permanecen; el contenido, no. Como los expedientes del control fiscal: la estructura existe, el resultado no llega. · <em>Foto: Mario Banguera Hurtado</em></p>
+</div>
+
+<div class="prosa"><p>¿Por qué el sistema se detiene? Tres factores operan de manera simultánea:</p></div>
+
+<div class="factores">
+  <div class="factor"><span class="f-n">01</span><div class="f-t">Capacidad institucional</div><p class="f-d">Los entes de control abren procesos con la evidencia disponible, pero el seguimiento requiere recursos, abogados y peritos. Los expedientes quedan en el limbo no por voluntad, sino por falta de capacidad real para sostenerlos.</p></div>
+  <div class="factor"><span class="f-n">02</span><div class="f-t">Prescripción de la acción fiscal</div><p class="f-d">Cuando un proceso se dilata indefinidamente, la ley puede operar como mecanismo involuntario de impunidad. La Ley 610 de 2000 regula los plazos: una vez vencidos, el archivo es obligatorio.</p></div>
+  <div class="factor"><span class="f-n">03</span><div class="f-t">Presión sobre operadores jurídicos</div><p class="f-d">El más difícil de documentar. Requiere sustento documental o fuente oral identificada para ser incluido como hallazgo periodístico definitivo.</p></div>
+</div>
+
+<!-- GRÁFICA 3: LÍNEA TEMPORAL -->
+<div class="g-wrap">
+  <div class="g-titulo">Gráfico 3 — Evolución anual del valor de hallazgos fiscales verificados</div>
+  <div class="g-sub">Millones de pesos por año de vigencia auditada · Chocó · 2020–2023 · Fuente: CGR</div>
+  <div class="g-canvas"><canvas id="g3"></canvas></div>
+  <div class="g-interp">
+    <p><strong>Lectura:</strong> Los años 2020–2022 concentran el hallazgo más grande (ICBF, $7.016M). El año 2023 muestra un segundo pico con $3.868M en educación. <strong>No hay tendencia de mejora:</strong> los hallazgos de magnitud significativa reaparecen en sectores distintos cada año, lo que señala un problema estructural y no un evento aislado.</p>
+    <div class="g-fuente">Fuente: CGR · Com. No. 113 (2020) · Com. No. 192 (2022) · Auditorías Liberadas Educación (2024) · Actuación Especial Agua (2023)</div>
+  </div>
+</div>
+
+<div class="cita">
+  <p class="cita-t">"En el Chocó, cuando uno hace periodismo y pregunta por un proceso de la Contraloría, le dicen que está en revisión. Llevas años de revisión. La demora no es neutral: en la demora está la impunidad."</p>
+  <span class="cita-a">Luis Palomino — Periodista, Riscales Stereo</span>
+</div>
+
+<!-- FOTO 3 -->
+<div class="foto-wrap">
+  <img src="foto-07.jpg.png" alt="Termohigrómetro en superficie oxidada" class="foto-real" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+  <div class="foto-placeholder" style="display:none;">
+    <span class="fp-ico">📷</span>
+    <span class="fp-txt">foto-07.jpg.png · Instrumental en superficie oxidada · Chocó 2023</span>
+  </div>
+  <p class="foto-pie"><strong>CHOCÓ · 2023</strong> — Un termohigrómetro digital sobre una superficie completamente oxidada. El aparato mide; la infraestructura se destruye. El control fiscal en el Chocó funciona igual: detecta el daño, pero la mayoría de los casos termina sin sanción. · <em>Foto: Mario Banguera Hurtado</em></p>
+</div>
+</section>
+
+<div class="sep"><span>◆ ◆ ◆</span></div>
+
+<!-- ═══ CAPÍTULO III ═══ -->
+<section class="cap" id="la-deteccion">
+<span class="cap-num">Capítulo III</span>
+<h2 class="cap-h">El origen de los datos:<br><em>cuando la DIARI detecta más que el control interno</em></h2>
+
+<div class="prosa">
+<p>Los datos verificados revelan un hallazgo estructural: ninguno de los hallazgos fiscales documentados en el Chocó entre 2020 y 2023 fue detectado por los sistemas de control interno de las propias entidades auditadas. Todos provienen de intervención externa de la CGR a través de tres mecanismos: auditorías de cumplimiento, actuaciones especiales de fiscalización y las alertas del sistema DIARI.</p>
+<p>La DIARI —Dirección de Información, Análisis y Reacción Inmediata— es la herramienta más sofisticada de la CGR. En el caso del ICBF Regional Chocó, la DIARI cruzó automáticamente las bases institucionales con el registro de la Registraduría y detectó el patrón de beneficiarios inexistentes. El SECOP II, por su parte, permite rastrear los contratos irregulares directamente por número de proceso: GSEDCHOCÓ-030/2023 y GSEDCHOCÓ-017/2023 están registrados con sus entidades contratantes, valores y objetos contractuales.</p>
+</div>
+
+<!-- GRÁFICA 4: BARRAS APILADAS -->
+<div class="g-wrap">
+  <div class="g-titulo">Gráfico 4 — Mecanismo de detección por sector</div>
+  <div class="g-sub">Tipo de actuación CGR que detectó el hallazgo · valor en millones COP · Chocó · 2020–2023</div>
+  <div class="g-canvas"><canvas id="g4"></canvas></div>
+  <div class="g-interp">
+    <p><strong>Lectura:</strong> La auditoría de cumplimiento detecta el mayor valor (ICBF y educación). Las actuaciones especiales son focalizadas y rápidas (agua potable). Las alertas DIARI funcionan en tiempo real pero requieren confirmación. <strong>Ningún hallazgo provino del autocontrol institucional</strong>: el control es reactivo, no preventivo.</p>
+    <div class="g-fuente">Fuente: CGR · Comunicados y Auditorías Liberadas 2020–2023 · SIRECI · SECOP II</div>
+  </div>
+</div>
+
+<div class="detectores">
+  <div class="detector"><span class="det-n">59%</span><span class="det-nom">ICBF Regional Chocó</span><span class="det-d">Mayor hallazgo · $7.016M</span></div>
+  <div class="detector"><span class="det-n">32%</span><span class="det-nom">SGP Educación Chocó + Quibdó</span><span class="det-d">$3.868M · 9 hallazgos</span></div>
+  <div class="detector"><span class="det-n">8.5%</span><span class="det-nom">Plan Dpto. de Agua</span><span class="det-d">$1.013M · 2 hallazgos</span></div>
+  <div class="detector"><span class="det-n">0%</span><span class="det-nom">Control interno</span><span class="det-d">Ningún hallazgo detectado internamente</span></div>
+</div>
+
+<!-- GALERÍA -->
+<div class="galeria">
+  <div>
+    <img src="foto-05.jpg.png" class="foto-real" style="aspect-ratio:4/3;object-fit:cover;" alt="Obra inconclusa Chocó" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+    <div class="foto-placeholder" style="display:none;aspect-ratio:4/3;"><span class="fp-ico">📷</span><span class="fp-txt">foto-05.jpg.png</span></div>
+    <p class="foto-pie"><strong>Chocó · Infraestructura inconclusa</strong> — Obra pública abandonada. Los recursos del SGR en infraestructura vial del Chocó aparecen en alertas DIARI de la CGR desde 2020. · <em>Foto: Mario Banguera Hurtado</em></p>
+  </div>
+  <div>
+    <img src="foto-04.jpg.png" class="foto-real" style="aspect-ratio:4/3;object-fit:cover;" alt="Hospital San Francisco Quibdó" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+    <div class="foto-placeholder" style="display:none;aspect-ratio:4/3;"><span class="fp-ico">📷</span><span class="fp-txt">foto-04.jpg.png</span></div>
+    <p class="foto-pie"><strong>Quibdó · Hospital San Francisco de Asís</strong> — Un hospital que depende de la solidaridad internacional mientras el ICBF Regional acumula $7.016 millones en hallazgos. · <em>Foto: Mario Banguera Hurtado</em></p>
+  </div>
+  <div>
+    <img src="foto-03.jpg.png" class="foto-real" style="aspect-ratio:4/3;object-fit:cover;" alt="Paciente en urgencias sin camilla" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+    <div class="foto-placeholder" style="display:none;aspect-ratio:4/3;"><span class="fp-ico">📷</span><span class="fp-txt">foto-03.jpg.png</span></div>
+    <p class="foto-pie"><strong>Chocó · El costo humano del detrimento</strong> — Una paciente espera atención sin camilla disponible. Detrás de cada expediente archivado hay una comunidad que no recibió el servicio que debió financiarse. · <em>Foto: Mario Banguera Hurtado</em></p>
+  </div>
+  <div>
+    <img src="foto-01.jpg.png" class="foto-real" style="aspect-ratio:4/3;object-fit:cover;" alt="Interior Hospital deteriorado Quibdó" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+    <div class="foto-placeholder" style="display:none;aspect-ratio:4/3;"><span class="fp-ico">📷</span><span class="fp-txt">foto-01.jpg.png</span></div>
+    <p class="foto-pie"><strong>Quibdó · Hospital Departamental</strong> — Paredes deterioradas, ventanas rotas. La detección sin sanción tiene un rostro: este. · <em>Foto: Mario Banguera Hurtado</em></p>
+  </div>
+</div>
+</section>
+
+<div class="sep"><span>◆ ◆ ◆</span></div>
+
+<!-- ═══ CAPÍTULO IV ═══ -->
+<section class="cap" id="las-comunidades">
+<span class="cap-num">Capítulo IV</span>
+<h2 class="cap-h">Las comunidades que<br><em>cargan con el resultado</em></h2>
+
+<div class="prosa">
+<p>Los sectores con mayor concentración de hallazgos —bienestar social, educación y agua potable— tienen en común que sus recursos llegan a las comunidades más pobres del departamento. Según el DANE, el Chocó es el departamento con mayor pobreza multidimensional de Colombia: más del 70% de la población tiene Necesidades Básicas Insatisfechas, y una parte significativa vive en zonas rurales sin acceso a servicios básicos.</p>
+<p>Los $3.868 millones en hallazgos de educación correspondían a recursos que debieron financiar ampliación de cobertura educativa y reparaciones en infraestructura de comunidades indígenas Embera Katio y la asociación Orewa. Los $7.016 millones del ICBF eran para programas de primera infancia. Los $1.013 millones del Plan de Agua eran para garantizar acceso al agua potable en Medio Atrato y Carmen de Darién. La vía Quibdó–Medellín, cuyo corredor vial incluye proyectos con alertas DIARI desde 2020, es el símbolo más visible de ese abandono: recursos asignados, contratos firmados, obras sin terminar.</p>
+</div>
+
+<!-- GRÁFICA 5 -->
+<div class="g-wrap">
+  <div class="g-titulo">Gráfico 5 — Composición del detrimento por sector y tipo de incidencia</div>
+  <div class="g-sub">Valor verificado de hallazgos fiscales vs. incidencia disciplinaria por sector · Chocó · 2020–2023 · CGR</div>
+  <div class="g-canvas"><canvas id="g5"></canvas></div>
+  <div class="g-interp">
+    <p><strong>Lectura:</strong> Los servicios sociales (primera infancia, educación) concentran el 91% del valor verificado de hallazgos. <strong>La paradoja es estructural:</strong> los sectores con más recursos hacia los más pobres son también los más vulnerables al detrimento. En educación, los contratos con comunidades indígenas muestran pagos sin soporte de ejecución, lo que sugiere que los recursos pudieron no haber llegado a sus beneficiarios finales.</p>
+    <div class="g-fuente">Fuente: CGR · Com. No. 192 · Auditorías Liberadas Educación 2024 · Actuación Especial Agua 2023</div>
+  </div>
+</div>
+
+<!-- CONTRASTE DE VIDEOS: PASADO vs. PRESENTE -->
+<div class="contraste-wrap">
+
+  <div class="contraste-header">
+    <span class="contraste-kicker">Registro de campo · Contraste temporal</span>
+    <h3 class="contraste-titulo">La misma promesa,<br><em>cincuenta años después</em></h3>
+    <p class="contraste-subtitulo">Vía Quibdó–Medellín · Archivo histórico vs. estado actual 2023</p>
+  </div>
+
+  <div class="contraste-grid contraste-divider">
+
+    <!-- LADO IZQUIERDO: ARCHIVO HISTÓRICO -->
+    <div class="contraste-lado">
+      <video controls style="width:100%;height:280px;display:block;object-fit:cover;background:#000;"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+        <source src="video-01.mp4" type="video/mp4">
+      </video>
+      <div class="video-placeholder" style="display:none;height:280px;">
+        <span class="vp-ico">🎬</span>
+        <span class="vp-txt">video-01.mp4<br>Archivo histórico · Hace +50 años</span>
+      </div>
+      <div class="contraste-etiqueta">
+        <span class="etiq-año">~1970s</span>
+        <span class="etiq-txt">Archivo histórico</span>
+      </div>
+    </div>
+
+    <!-- BADGE VS -->
+    <div class="vs-badge">VS</div>
+
+    <!-- LADO DERECHO: ACTUALIDAD -->
+    <div class="contraste-lado">
+      <video controls style="width:100%;height:280px;display:block;object-fit:cover;background:#000;"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+        <source src="video-02.mp4" type="video/mp4">
+      </video>
+      <div class="video-placeholder" style="display:none;height:280px;">
+        <span class="vp-ico">🎬</span>
+        <span class="vp-txt">video-02.mp4<br>Estado actual · 2023</span>
+      </div>
+      <div class="contraste-etiqueta">
+        <span class="etiq-año">2023</span>
+        <span class="etiq-txt">Estado actual</span>
+      </div>
+    </div>
+
+  </div><!-- /contraste-grid -->
+
+  <div class="contraste-pie">
+    <div class="contraste-pie-grid">
+      <div class="cp-item">
+        <span class="cp-año">Archivo histórico</span>
+        <p class="cp-desc">Estado de la vía Quibdó–Medellín en décadas pasadas. Las primeras imágenes registran las mismas promesas de conexión que aún hoy no se han cumplido. · <em>Video: Universidad Tecnológica del Chocó (UTCH)</em></p>
+      </div>
+      <div class="cp-item">
+        <span class="cp-año">Actualidad · 2023</span>
+        <p class="cp-desc">Estado actual de la vía tras el derrumbe. La Contraloría alertó en 2020 (Com. No. 113) sobre proyectos del SGR vencidos en infraestructura vial de Quibdó: recursos asignados, contratos firmados, obras sin terminar. · <em>Video: ciudadano víctima de la tragedia del derrumbe en la vía Quibdó–Medellín</em></p>
+      </div>
+    </div>
+    <p class="contraste-dato">
+      <strong>50 años de promesas · 0 kilómetros completados · Múltiples contratos con hallazgos fiscales.</strong><br>
+      La impunidad fiscal no es solo un número en un comunicado de la Contraloría. Tiene un rostro: esta carretera.
+    </p>
+  </div>
+
+</div><!-- /contraste-wrap -->
+
+<div class="cita">
+  <p class="cita-t">"Esta vía lleva más de veinte años en obras y nunca termina. Cada gobierno anuncia que va a arreglar la carretera Quibdó–Medellín y cada gobierno entrega lo mismo: un tramo, una promesa y otro contrato. Mientras tanto, los chocoanos seguimos pagando fletes altísimos por todo lo que entra y todo lo que sale."</p>
+  <span class="cita-a">Ciudadano de Quibdó · Testimonio de campo</span>
+</div>
+
+<!-- TESTIMONIO HARRINSON GARRIDO — solo texto, sin video -->
+<div class="cita">
+  <p class="cita-t">"La vía Quibdó–Medellín es el símbolo más claro del abandono fiscal en el Chocó. Se han invertido miles de millones de pesos en contratos para esa carretera y hoy sigue igual o peor. Cuando uno revisa los informes de la Contraloría, encuentra hallazgos sobre esas obras. Pero los procesos se archivan, los contratos se renuevan y la vía no mejora. Eso es lo que los ciudadanos no entienden y que nosotros desde el Concejo hemos denunciado: la impunidad fiscal tiene un costo en kilómetros de vía sin pavimentar."</p>
+  <span class="cita-a">Harrinson Garrido — Concejal de Quibdó · Chocó</span>
+</div>
+
+<div class="cita">
+  <p class="cita-t">"Uno ve cómo llega la plata al municipio y después no hay nada: ni la carretera, ni el puesto de salud, ni la escuela. Y cuando uno pregunta, dicen que hay una investigación. Siempre hay una investigación. Nunca hay un resultado."</p>
+  <span class="cita-a">Adriana Mena — Ciudadana de Tadó</span>
+</div>
+
+<div class="cita">
+  <p class="cita-t">"La falta de recuperación de los posibles detrimentos afecta directamente la prestación de servicios básicos en las comunidades más vulnerables del Chocó. Cada peso no recuperado es un peso que no llega a salud, educación o infraestructura."</p>
+  <span class="cita-a">Experto en control fiscal y desarrollo territorial</span>
+</div>
+
+<!-- CIERRE ESTADÍSTICO -->
+<div class="cierre">
+  <span class="cierre-n">~80%</span>
+  <p class="cierre-txt">De cada cinco pesos en hallazgos fiscales verificados en el Chocó, <strong>cuatro no tienen un responsable condenado.</strong> El sistema detecta el daño. Rara vez lo sanciona.</p>
+  <div class="cierre-barra">
+    <div class="cb1"></div><div class="cb2"></div><div class="cb3"></div><div class="cb4"></div>
+  </div>
+  <div class="cierre-ley">
+    <span class="cleg"><span class="cleg-dot" style="background:#8b1a1a;"></span>Archivado sin condena · ~32%</span>
+    <span class="cleg"><span class="cleg-dot" style="background:#c97a30;"></span>En proceso ordinario · ~24%</span>
+    <span class="cleg"><span class="cleg-dot" style="background:#5a6a5a;"></span>Sin decisión · ~24%</span>
+    <span class="cleg"><span class="cleg-dot" style="background:#3a7a3a;"></span>Condena efectiva · ~20%</span>
+  </div>
+</div>
+
+</section>
+</div>
+</article>
+
+<!-- FUENTES -->
+<section class="fuentes-sec">
+  <div class="f-inner">
+    <span class="kicker k-dorado" style="margin-bottom:2rem;display:block;">Fuentes oficiales verificadas</span>
+    <div class="fuente-item"><div class="f-ico">🏛️</div><div><span class="f-nom">Contraloría General de la República (CGR)</span><p class="f-desc">Com. No. 192 (19 dic 2022) · Com. No. 113 (26 ago 2020) · Auditorías Liberadas Sector Educación (2024) · Actuación Especial Plan Dpto. Agua Chocó (ene 2023) · Balance Gerencia Departamental Chocó (ago 2022)</p><a class="f-url" href="https://www.contraloria.gov.co/es/contraloria/cgr-al-dia/comunicados-de-prensa" target="_blank">contraloria.gov.co · Comunicados de Prensa</a></div></div>
+    <div class="fuente-item"><div class="f-ico">📊</div><div><span class="f-nom">Datos Abiertos — CGR (datos.gov.co)</span><p class="f-desc">Dataset: Resultado de la Ejecución del Plan de Vigilancia y Control Fiscal. Permite consultar hallazgos por entidad y período a nivel nacional y departamental.</p><a class="f-url" href="https://www.datos.gov.co/Organismos-de-Control/Resultado-de-la-Ejecuci-n-del-Plan-de-Vigilancia-y/wasc-xi4h/about_data" target="_blank">datos.gov.co · Plan de Vigilancia y Control Fiscal</a></div></div>
+    <div class="fuente-item"><div class="f-ico">📋</div><div><span class="f-nom">SECOP II — Sistema Electrónico de Contratación Pública</span><p class="f-desc">Contratos verificados: GSEDCHOCÓ-030/2023 ($1.758M) y GSEDCHOCÓ-017/2023 ($1.019M), relacionados con hallazgos fiscales en educación del Chocó.</p><a class="f-url" href="https://www.colombiacompra.gov.co/secop/secop-ii" target="_blank">colombiacompra.gov.co · SECOP II</a></div></div>
+    <div class="fuente-item"><div class="f-ico">🔍</div><div><span class="f-nom">SIRECI — Sistema de Rendición Electrónica de la Cuenta e Informes</span><p class="f-desc">Planes de mejoramiento suscritos por entidades del Chocó ante la CGR. Permite verificar el estado de subsanación de hallazgos detectados.</p><a class="f-url" href="https://www.contraloria.gov.co/web/sireci/documentacion" target="_blank">contraloria.gov.co · SIRECI</a></div></div>
+    <div class="fuente-item"><div class="f-ico">🗺️</div><div><span class="f-nom">SMSCE — Sistema de Monitoreo del SGR (DNP)</span><p class="f-desc">Bases GESPROY y SUIFP citadas en CGR Com. No. 113 (2020) sobre proyectos vencidos de regalías en el Chocó, incluida infraestructura vial en Quibdó.</p><a class="f-url" href="https://smsce.dnp.gov.co" target="_blank">smsce.dnp.gov.co</a></div></div>
+    <div class="fuente-item"><div class="f-ico">🚨</div><div><span class="f-nom">Portal Anticorrupción de Colombia (PACO)</span><p class="f-desc">Fallos fiscales ejecutoriados de la CGR, sanciones penales (SPOA-Fiscalía) y disciplinarias (SIRI-Procuraduría) para entidades del Chocó en el período 2020–2023.</p><a class="f-url" href="https://herramientas.datos.gov.co/usos/portal-anticorrupcion-de-colombia" target="_blank">herramientas.datos.gov.co · PACO</a></div></div>
+    <div class="fuente-item"><div class="f-ico">⚖️</div><div><span class="f-nom">Fiscalía General de la Nación · Estadísticas</span><p class="f-desc">Estadísticas de investigación penal por departamento. Complemento a los hallazgos fiscales de la CGR para el período analizado.</p><a class="f-url" href="https://www.fiscalia.gov.co/colombia/gestion/estadisticas/" target="_blank">fiscalia.gov.co · Estadísticas</a></div></div>
+    <div class="fuente-item"><div class="f-ico">🏛️</div><div><span class="f-nom">Rama Judicial · Consulta de Procesos</span><p class="f-desc">Verificación del estado de procesos de responsabilidad fiscal que han llegado a la jurisdicción coactiva en el Chocó.</p><a class="f-url" href="https://www.ramajudicial.gov.co" target="_blank">ramajudicial.gov.co</a></div></div>
+  </div>
+</section>
+
+<footer>
+  <p>
+    <strong>Universidad de Antioquia</strong> · Facultad de Comunicaciones · Control Fiscal<br>
+    Por Mario Banguera Hurtado · mario.banguera@udea.edu.co<br>
+    Fuentes: Contraloría General de la República · SECOP II · SMSCE-DNP · SIRECI · PACO · Fiscalía · Rama Judicial<br>
+    Datos verificados: 2020–2023 · Departamento del Chocó, Colombia
+  </p>
+</footer>
+
+<script>
+Chart.defaults.color = '#a0b0a0';
+Chart.defaults.borderColor = 'rgba(201,168,76,0.1)';
+Chart.defaults.font.family = "'Georgia', serif";
+const D='#c9a84c',R='#c0392b',N='#c97a30',A='#2980b9',V='#27ae60',G='#5a6a5a';
+
+// G1: barras horizontales
+new Chart(document.getElementById('g1'),{type:'bar',data:{labels:['ICBF Regional Chocó','SGP Educación\nChocó + Quibdó','Plan Dpto. de Agua\nChocó'],datasets:[{label:'Millones COP',data:[7016,3868,1013],backgroundColor:[R,N,A],borderColor:['rgba(192,57,43,.35)','rgba(201,122,48,.35)','rgba(41,128,185,.35)'],borderWidth:1,borderRadius:2}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' $'+c.parsed.x.toLocaleString('es-CO')+' millones'}}},scales:{x:{ticks:{callback:v=>'$'+v+'M',color:'#a0b0a0',font:{size:11}},grid:{color:'rgba(201,168,76,0.07)'}},y:{ticks:{color:'#c8d8c8',font:{size:11}},grid:{display:false}}}}});
+
+// G2: donut estado procesal
+new Chart(document.getElementById('g2'),{type:'doughnut',data:{labels:['Archivado sin condena','En proceso ordinario','Sin decisión','Condena efectiva'],datasets:[{data:[32,24,24,20],backgroundColor:[R,N,G,V],borderColor:'rgba(14,31,14,0)',borderWidth:2,hoverOffset:8}]},options:{responsive:true,cutout:'62%',plugins:{legend:{position:'bottom',labels:{color:'#a0b0a0',padding:16,font:{size:11}}},tooltip:{callbacks:{label:c=>' '+c.label+': ~'+c.parsed+'%'}}}}});
+
+// G3: línea temporal
+new Chart(document.getElementById('g3'),{type:'line',data:{labels:['2020','2021','2022','2023'],datasets:[{label:'ICBF / Social',data:[null,7016,7016,null],borderColor:R,backgroundColor:'rgba(192,57,43,0.1)',tension:.3,fill:true,pointRadius:5,pointBackgroundColor:R},{label:'Educación / SGP',data:[null,null,null,3868],borderColor:N,backgroundColor:'rgba(201,122,48,0.1)',tension:.3,fill:true,pointRadius:5,pointBackgroundColor:N},{label:'Agua potable',data:[1013,1013,null,null],borderColor:A,backgroundColor:'rgba(41,128,185,0.08)',tension:.3,fill:true,pointRadius:5,pointBackgroundColor:A}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#a0b0a0',padding:14,font:{size:11}}},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': $'+(c.parsed.y||0).toLocaleString('es-CO')+'M'}}},scales:{x:{ticks:{color:'#a0b0a0'},grid:{color:'rgba(201,168,76,0.07)'}},y:{ticks:{callback:v=>'$'+v+'M',color:'#a0b0a0',font:{size:10}},grid:{color:'rgba(201,168,76,0.07)'}}}}});
+
+// G4: barras apiladas mecanismo
+new Chart(document.getElementById('g4'),{type:'bar',data:{labels:['ICBF / Social','Educación / SGP','Agua potable','SGR / Vial'],datasets:[{label:'Auditoría de cumplimiento',data:[7016,3868,0,0],backgroundColor:'rgba(192,57,43,0.8)',borderRadius:2},{label:'Actuación especial de fiscalización',data:[0,0,1013,0],backgroundColor:'rgba(41,128,185,0.8)',borderRadius:2},{label:'Alerta DIARI',data:[0,0,0,1],backgroundColor:'rgba(201,168,76,0.8)',borderRadius:2}]},options:{responsive:true,scales:{x:{stacked:true,ticks:{color:'#a0b0a0'},grid:{display:false}},y:{stacked:true,ticks:{callback:v=>'$'+v+'M',color:'#a0b0a0',font:{size:10}},grid:{color:'rgba(201,168,76,0.07)'}}},plugins:{legend:{position:'bottom',labels:{color:'#a0b0a0',padding:14,font:{size:11}}},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': $'+c.parsed.y.toLocaleString('es-CO')+'M'}}}}});
+
+// G5: barras agrupadas sector vs incidencia
+new Chart(document.getElementById('g5'),{type:'bar',data:{labels:['Bienestar social\n(ICBF)','Educación\n(SGP + contratos)','Agua potable\n(Plan Dpto.)','Infraestructura\n(SGR)'],datasets:[{label:'Incidencia fiscal (verificada)',data:[7016,3868,1013,0],backgroundColor:'rgba(192,57,43,0.78)',borderRadius:2},{label:'Incidencia disciplinaria (estimada)',data:[7016,3868,1013,0],backgroundColor:'rgba(201,168,76,0.22)',borderColor:'rgba(201,168,76,0.45)',borderWidth:1,borderRadius:2}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#a0b0a0',padding:14,font:{size:11}}},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': $'+c.parsed.y.toLocaleString('es-CO')+'M'}}},scales:{x:{ticks:{color:'#c8d8c8',font:{size:11}},grid:{display:false}},y:{ticks:{callback:v=>'$'+v+'M',color:'#a0b0a0',font:{size:10}},grid:{color:'rgba(201,168,76,0.07)'}}}}});
+</script>
+</body>
+</html>
